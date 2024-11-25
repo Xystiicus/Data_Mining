@@ -1,0 +1,249 @@
+data = pd.read_csv('data.csv')
+# defining .csv data with read_csv() to data variable.
+
+
+##step 1 (traning data and clasification)
+X = data.iloc[:,:-1] 
+y = data.iloc[:,-1]  
+X_train, X_test,y_train,y_test = train_test_split(X,y,test_size=0.3,random_state=12)
+# # OUTPUT # #
+X_train size (350, 3)
+y_train size (350,)
+X_test size (150, 3)
+y_test size (150,)
+# # 
+# outputting  the size of all variables
+# We are set X and y variables and seperating the values to train and test values. 
+# With train_test_split() function, we define test size in there 0.3 corresponds to 30% size.
+# As the documentation said random state not matter, it will give the same split of data. 
+
+
+scaler = preprocessing.StandardScaler().fit(X_train)
+X_train = scaler.transform(X_train)
+X_test = scaler.transform(X_test)
+# #
+# In there we normalize the data for the classification.
+
+
+k = 20
+metric_array = np.zeros((k-1))
+for n in range(1,k):
+    model = KNeighborsClassifier(n_neighbors=n).fit(X_train,y_train)
+    y_hat = model.predict(X_test)
+    metric_array[n-1] = metrics.accuracy_score(y_test,y_hat)
+print(metric_array) 
+# # OUTPUT # #
+[0.30666667 0.36       0.34666667 0.33333333 0.36       0.34
+ 0.32       0.34       0.37333333 0.32666667 0.36       0.30666667
+ 0.31333333 0.3        0.28666667 0.3        0.28666667 0.28666667
+ 0.30666667]
+# #
+# We define the k to define max outputting values and took 20 values. 
+# After that result and find the best accuracy is 3.
+# With this we found the k = 3 is best for classification KNN.
+
+
+
+k=3
+model_knn = KNeighborsClassifier(n_neighbors=k).fit(X_train,y_train)
+y_hat_knn = model_knn.predict(X_test) 
+# # OUTPUT # #
+[2022 2011 2008 2008 2008 2022 2008 2008 2011 2011 2008 2008 2022 2008
+ 2008 2008 2022 2008 2008 2011 2011 2008 2008 2008 2011 2011 2008 2011
+ 2011 2011 2008 2008 2008 2008 2022 2011 2022 2008 2008 2008 2011 2022
+ 2008 2011 2008 2008 2008 2011 2008 2008 2022 2011 2011 2008 2022 2008
+ 2008 2011 2022 2022 2008 2008 2011 2011 2008 2022 2022 2011 2008 2022
+ 2008 2011 2011 2022 2008 2022 2011 2008 2008 2022 2008 2022 2008 2011
+ 2011 2008 2022 2008 2011 2022 2008 2022 2008 2011 2008 2011 2022 2011
+ 2011 2022 2022 2008 2011 2008 2011 2008 2011 2008 2008 2008 2008 2011
+ 2022 2008 2008 2011 2022 2008 2008 2011 2008 2008 2011 2011 2008 2011
+ 2022 2011 2011 2022 2022 2022 2008 2011 2011 2011 2008 2008 2011 2011
+ 2011 2008 2008 2008 2008 2022 2008 2022 2008 2008]
+# #
+# In Here we do clasification KNN.
+
+
+clf = svm.SVC(kernel='rbf')
+clf.fit(X_train,y_train)
+y_hat_svm = clf.predict(X_test)
+# # OUTPUT # #
+[2011 2011 2008 2011 2008 2011 2011 2008 2008 2011 2008 2011 2008 2008
+ 2011 2008 2008 2008 2008 2011 2011 2008 2008 2011 2011 2011 2022 2008
+ 2008 2008 2022 2008 2011 2011 2022 2011 2008 2011 2008 2008 2008 2008
+ 2008 2008 2008 2008 2008 2011 2008 2008 2022 2008 2008 2011 2008 2008
+ 2011 2011 2008 2008 2011 2008 2008 2022 2008 2011 2008 2008 2011 2008
+ 2022 2008 2008 2011 2008 2011 2008 2008 2008 2011 2011 2008 2008 2011
+ 2011 2008 2008 2011 2011 2022 2008 2011 2008 2011 2011 2011 2022 2011
+ 2011 2008 2008 2008 2008 2008 2008 2008 2022 2011 2008 2008 2008 2008
+ 2022 2008 2008 2011 2008 2008 2011 2011 2011 2011 2008 2011 2008 2011
+ 2011 2011 2011 2011 2008 2008 2008 2011 2008 2008 2008 2008 2008 2011
+ 2008 2008 2011 2008 2008 2022 2008 2022 2011 2008]
+# #
+# We also classify data with SVM.
+
+
+all_labels = sorted(np.unique(y_test)) 
+confusion_matrix_svm = confusion_matrix(y_test, y_hat_svm, labels=all_labels)
+cm_display_svm = ConfusionMatrixDisplay(
+    confusion_matrix=confusion_matrix_svm,
+    display_labels=all_labels
+)
+cm_display_svm.plot()
+plt.title('FIRST Confusion matrix for svm')
+plt.show()
+# #
+# we define the unique to labels and we use this for confusion matrix.
+# ConfusionMatrixDisplay() allow to define matrix and labels.
+# With plot() and show() we take the result of SVM confusion matrix 
+
+
+confusion_matrix_knn = confusion_matrix(y_test,y_hat_knn,labels=all_labels)
+cm_display_knn = ConfusionMatrixDisplay(
+    confusion_matrix=confusion_matrix_knn,
+    display_labels=all_labels
+)
+cm_display_knn.plot()
+plt.title('FIRST Confusion matrix for knn')
+plt.show()
+# #
+# As the Svm confusion we define the KNN as it is and displaying the confusion matrix.
+
+
+## 2. step 
+random_numbers = random.sample(range(17, 101), 5)
+data['Age'] = data['Age'].replace([random_numbers],np.nan)
+print('NaN data replaced by randomly values\n',data)
+# # OUTPUT # #
+NaN data replaced by randomly values
+      Gender   Age  Weight  Year
+0         1   NaN      92  2008
+1         0  29.0      88  2022
+2         1  50.0      64  2022
+3         1  18.0      96  2011
+4         0  29.0      60  2022
+..      ...   ...     ...   ...
+495       0  49.0      90  2008
+496       0  42.0      94  2011
+497       0  70.0      88  2022
+498       1  40.0      98  2022
+499       1  19.0      75  2008
+# #
+# we gave the randomly values to made NaN.
+# We only want a one coloumn with NaN values so we write the specify data coloumn name
+# and we printing the result in the terminal.
+
+
+## 3. step (filling null datas with coloumn mean)
+data = data.fillna(data['Age'].mean())
+print('NaN values replaced by itself column mean',data)
+# # OUTPUT # #
+        Gender   Age  Weight  Year
+0         1  47.143162      92  2008
+1         0  29.000000      88  2022
+2         1  50.000000      64  2022
+3         1  18.000000      96  2011
+4         0  29.000000      60  2022
+..      ...        ...     ...   ...
+495       0  49.000000      90  2008
+496       0  42.000000      94  2011
+497       0  70.000000      88  2022
+498       1  40.000000      98  2022
+499       1  19.000000      75  2008
+# #
+# We filling the NaN values in Age coloumn with the it column mean.
+# printing the result in the terminal.
+
+
+
+## 4. step(training new data like step 1)
+X = data.iloc[:,:-1] 
+y = data.iloc[:,-1] #last coloumn selected for the y (target)
+X_train, X_test,y_train,y_test = train_test_split(X,y,test_size=0.3,random_state=12)
+# # 
+# After that we define X and y with new data variable.
+
+
+scaler = preprocessing.StandardScaler().fit(X_train)
+X_train = scaler.transform(X_train)
+X_test = scaler.transform(X_test)
+k = 20
+metric_array = np.zeros((k-1))
+# #
+# again we put the k= 20 to see 20 value in terminal.
+
+
+for n in range(1,k):
+    #print(n)
+    model = KNeighborsClassifier(n_neighbors=n).fit(X_train,y_train)
+    y_hat = model.predict(X_test)
+    metric_array[n-1] = metrics.accuracy_score(y_test,y_hat)
+print(metric_array) 
+# # OUTPUT # #
+[0.3        0.34       0.32666667 0.28       0.32666667 0.32666667
+ 0.30666667 0.32666667 0.32666667 0.30666667 0.34666667 0.3
+ 0.31333333 0.27333333 0.30666667 0.27333333 0.27333333 0.26666667
+ 0.26      ]
+# #
+# generally we found k = 3 best for accuracy.
+
+
+k=3
+model_knn = KNeighborsClassifier(n_neighbors=k).fit(X_train,y_train)
+y_hat_knn = model_knn.predict(X_test)
+# # OUTPUT # #
+[2022 2011 2008 2008 2008 2022 2008 2008 2011 2011 2008 2008 2022 2008      
+ 2008 2008 2008 2008 2008 2011 2011 2008 2008 2008 2011 2008 2008 2011
+ 2011 2011 2008 2008 2008 2011 2022 2011 2022 2008 2008 2008 2011 2022
+ 2008 2011 2008 2011 2011 2011 2008 2008 2022 2011 2011 2022 2022 2008
+ 2008 2022 2022 2022 2008 2008 2011 2011 2008 2022 2022 2011 2008 2022
+ 2011 2011 2011 2022 2008 2022 2011 2011 2008 2022 2008 2008 2008 2011
+ 2011 2008 2022 2008 2011 2022 2008 2022 2008 2011 2008 2011 2022 2011
+ 2011 2022 2022 2008 2011 2008 2011 2008 2011 2008 2008 2008 2008 2011
+ 2022 2008 2022 2011 2022 2008 2008 2011 2008 2008 2011 2011 2008 2011
+ 2022 2011 2011 2022 2011 2022 2008 2011 2011 2011 2008 2008 2011 2011
+ 2011 2008 2008 2008 2008 2008 2008 2022 2011 2008]
+# # result of classifited KNN.
+
+
+###svm classification
+clf = svm.SVC(kernel='rbf')
+clf.fit(X_train,y_train)
+y_hat_svm = clf.predict(X_test)
+# # OUTPUT # #
+[2008 2011 2008 2022 2008 2011 2011 2008 2008 2011 2008 2011 2008 2008
+ 2011 2008 2008 2008 2008 2011 2011 2011 2011 2011 2011 2011 2022 2008
+ 2008 2008 2022 2008 2011 2011 2022 2011 2008 2011 2008 2011 2008 2008
+ 2008 2008 2011 2008 2011 2011 2008 2008 2022 2008 2008 2008 2022 2008
+ 2011 2011 2008 2008 2011 2011 2008 2022 2008 2011 2008 2008 2011 2008
+ 2011 2008 2008 2011 2008 2011 2011 2011 2008 2011 2011 2008 2008 2011
+ 2011 2008 2011 2011 2011 2022 2008 2011 2008 2011 2011 2011 2022 2011
+ 2011 2011 2008 2008 2022 2008 2008 2008 2022 2011 2008 2008 2008 2008
+ 2022 2008 2008 2011 2008 2008 2011 2011 2011 2008 2008 2011 2008 2011
+ 2011 2011 2011 2011 2008 2008 2008 2011 2008 2008 2011 2008 2008 2011
+ 2008 2022 2008 2011 2008 2011 2008 2022 2011 2008]
+# # result of SVM clasification.
+
+
+#confusion matrix for svm(new data)
+all_labels = sorted(np.unique(y_test)) 
+confusion_matrix_svm = confusion_matrix(y_test, y_hat_svm, labels=all_labels)
+cm_display_svm = ConfusionMatrixDisplay(
+    confusion_matrix=confusion_matrix_svm,
+    display_labels=all_labels
+)
+cm_display_svm.plot()
+plt.title('LAST Confusion matrix for svm')
+plt.show()
+# # In there with show we can see the Confusion matrix SVM, after the edited data
+
+
+#confusion matrix for knn(new data)
+confusion_matrix_knn = confusion_matrix(y_test,y_hat_knn,labels=all_labels)
+cm_display_knn = ConfusionMatrixDisplay(
+    confusion_matrix=confusion_matrix_knn,
+    display_labels=all_labels
+)
+cm_display_knn.plot()
+plt.title('LAST Confusion matrix for knn')
+plt.show()
+# # In there with show we can see the Confusion matrix KNN, after the edited data
